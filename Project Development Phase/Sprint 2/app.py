@@ -118,7 +118,6 @@ def register():
             msg = "You have successfully registered."
             
             try:
-                sg = sendgrid.SendGridAPIClient('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')
             # Change to your verified sender
                 from_email = Email("dikshakrish5@gmail.com")
                 to_email = To(email)  # Change to your recipient
@@ -218,7 +217,6 @@ def rec_register():
             ibm_db.execute(prep_stmt)
             
             try:
-                sg = sendgrid.SendGridAPIClient('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')
             # Change to your verified sender
                 from_email = Email("dikshakrish5@gmail.com")
                 to_email = To(pers_email)  # Change to your recipient
@@ -401,26 +399,6 @@ def apply_job():
 
     elif request.method == 'POST': msg="Please fill out the form."
     return render_template('apply.html')
-
-def sendgridmail(to_mail_id):
-    try:
-        sg = sendgrid.SendGridAPIClient(
-            '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')
-    # Change to your verified sender
-        from_email = Email("kencydanielfdo@gmail.com")
-        to_email = To(to_mail_id)  # Change to your recipient
-        subject = "Plasma Donation request "
-        htmlcontent = "Hi, A user has sent you a request for plasma donation. If you are willing to donate kindly contact them with this email id. Email: " + \
-            session['email']
-        content = Content("text/plain", htmlcontent)
-        mail = Mail(from_email, to_email, subject, content)
-    # Get a JSON-ready representation of the Mail object
-        mail_json = mail.get()
-    # Send an HTTP POST request to /mail/send
-        response = sg.client.mail.send.post(request_body=mail_json)
-        print(response.status_code)
-    except Exception as e:
-        print(e.message)
 
 if __name__=="__main__":
     app.run(host='0.0.0.0', debug=True)

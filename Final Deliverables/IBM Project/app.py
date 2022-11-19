@@ -147,7 +147,10 @@ def register():
 #            sendgridmail(to_email,password)
 
             try:
+<<<<<<< HEAD
                 sg = sendgrid.SendGridAPIClient('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')
+=======
+>>>>>>> c925fd42931ea20eca1eddfaf66b18249373262a
             # Change to your verified sender
                 from_email = Email("dhanalakshmi.sat@gmail.com")
                 to_email = To(email)  # Change to your recipient
@@ -247,7 +250,10 @@ def rec_register():
             ibm_db.execute(prep_stmt)
             
             try:
+<<<<<<< HEAD
                 sg = sendgrid.SendGridAPIClient('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')
+=======
+>>>>>>> c925fd42931ea20eca1eddfaf66b18249373262a
             # Change to your verified sender
                 from_email = Email("dhanalakshmi.sat@gmail.com")
                 to_email = To(pers_email)  # Change to your recipient
