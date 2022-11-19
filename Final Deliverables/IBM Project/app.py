@@ -1,5 +1,8 @@
 from flask import Flask,render_template, redirect, request, session
-import ibm_db, re, smtplib, sendgrid, os
+import ibm_db, re
+import smtplib
+import sendgrid
+import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Email, To, Content
 #SUBJECT = "Interview Call"
@@ -23,13 +26,37 @@ conn = ibm_db.connect("DATABASE=bludb;HOSTNAME=125f9f61-9715-46f9-9399-c8177b218
 def home():
     return render_template('home.html')
 
-@app.route('/learning_module')
+@app.route('/learning_module',methods=["GET","POST"])
 def learning_module():
     return render_template('learning_module.html')
 
-@app.route('/applicants_list')
+@app.route('/applicants_list',methods=["GET","POST"])
 def applicants_list():
     return render_template('applicants_list.html')
+
+@app.route('/rec_domain',methods=["GET","POST"])
+def rec_domain():
+    return render_template('rec_domain.html')
+
+@app.route('/applicant_domain',methods=["GET","POST"])
+def applicant_domain():
+    return render_template('applicant_domain.html')
+
+@app.route('/ds_job_list',methods=["GET","POST"])
+def ds_job_list():
+    return render_template('ds_job_list.html')
+
+@app.route('/java_job_list',methods=["GET","POST"])
+def java_job_list():
+    return render_template('java_job_list.html')
+
+@app.route('/web_dev_job_list',methods=["GET","POST"])
+def web_dev_job_list():
+    return render_template('web_dev_job_list.html')
+
+@app.route('/ai_job_list',methods=["GET","POST"])
+def ai_job_list():
+    return render_template('ai_job_list.html')
     
 @app.route('/login',methods=["GET","POST"])
 def login():
@@ -116,11 +143,13 @@ def register():
             
             ibm_db.execute(prep_stmt)
             msg = "You have successfully registered."
-            
+ #           to_email = To(email)
+#            sendgridmail(to_email,password)
+
             try:
-                sg = sendgrid.SendGridAPIClient('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')
+                sg = sendgrid.SendGridAPIClient('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')
             # Change to your verified sender
-                from_email = Email("dikshakrish5@gmail.com")
+                from_email = Email("dhanalakshmi.sat@gmail.com")
                 to_email = To(email)  # Change to your recipient
                 subject = "Registration Success"
                 htmlcontent = "Congratulations on registering at ADDK Job Finders! Here are your login credentials:\n Username: "+email+"\nPassword: "+password
@@ -131,9 +160,9 @@ def register():
             # Send an HTTP POST request to /mail/send
                 response = sg.client.mail.send.post(request_body=mail_json)
                 print(response.status_code)
+                return render_template('home.html', msg=msg) 
             except Exception as e:
-                print(e)
-            return render_template('login.html', msg=msg)    
+                print(e)   
         
     elif request.method == 'POST': msg="Please fill out the form."
     return render_template('register.html')
@@ -218,9 +247,9 @@ def rec_register():
             ibm_db.execute(prep_stmt)
             
             try:
-                sg = sendgrid.SendGridAPIClient('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')
+                sg = sendgrid.SendGridAPIClient('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')
             # Change to your verified sender
-                from_email = Email("dikshakrish5@gmail.com")
+                from_email = Email("dhanalakshmi.sat@gmail.com")
                 to_email = To(pers_email)  # Change to your recipient
                 subject = "Registration Success"
                 htmlcontent = "Congratulations on registering at ADDK Job Finders! Here are your login credentials:\n Username: "+pers_email+"\nPassword: "+password
@@ -233,7 +262,7 @@ def rec_register():
                 print(response.status_code)
             except Exception as e:
                 print(e)
-            return render_template('rec_login.html')
+            return render_template('home.html')
     
     elif request.method == 'POST': msg="Please fill out the form."
     return render_template('rec_register.html')
@@ -380,8 +409,10 @@ def apply_job():
         email = request.form['email']
         phone = request.form['phone']
         resume = request.form['resume']
+        comp_name = request.form['comp_name']
+        position = request.form['position']
         
-        sql="INSERT INTO APPLY_JOB VALUES(?,?,?,?,?,?,?,?,?,?,?)"
+        sql="INSERT INTO APPLY_JOB VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)"
         stmt=ibm_db.prepare(conn,sql)
         ibm_db.bind_param(stmt,1,fname)
         ibm_db.bind_param(stmt,2,lname)
@@ -394,6 +425,8 @@ def apply_job():
         ibm_db.bind_param(stmt,9,email)
         ibm_db.bind_param(stmt,10,phone)
         ibm_db.bind_param(stmt,11,resume)
+        ibm_db.bind_param(stmt,12,comp_name)
+        ibm_db.bind_param(stmt,13,position)
         
         ibm_db.execute(stmt)
         msg='You have successfully applied!'
@@ -401,26 +434,6 @@ def apply_job():
 
     elif request.method == 'POST': msg="Please fill out the form."
     return render_template('apply.html')
-
-def sendgridmail(to_mail_id):
-    try:
-        sg = sendgrid.SendGridAPIClient(
-            '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')
-    # Change to your verified sender
-        from_email = Email("kencydanielfdo@gmail.com")
-        to_email = To(to_mail_id)  # Change to your recipient
-        subject = "Plasma Donation request "
-        htmlcontent = "Hi, A user has sent you a request for plasma donation. If you are willing to donate kindly contact them with this email id. Email: " + \
-            session['email']
-        content = Content("text/plain", htmlcontent)
-        mail = Mail(from_email, to_email, subject, content)
-    # Get a JSON-ready representation of the Mail object
-        mail_json = mail.get()
-    # Send an HTTP POST request to /mail/send
-        response = sg.client.mail.send.post(request_body=mail_json)
-        print(response.status_code)
-    except Exception as e:
-        print(e.message)
 
 if __name__=="__main__":
     app.run(host='0.0.0.0', debug=True)
